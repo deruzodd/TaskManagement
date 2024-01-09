@@ -1,0 +1,196 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+
+    {% include "navbar.html" %}
+
+    {% if messages %}
+        <div class="columns" style="margin-top: 20px;">
+            <div class="column"></div>
+            <div class="column is-8">
+                <article class="message is-danger">
+                    <div class="message-body">
+                        <ul class="messages">
+                            {% for message in messages %}
+                                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </article>
+            </div>
+            <div class="column"></div>
+        </div>
+    {% endif %}
+
+    <div class="columns" style="margin-top:10px;padding : 15px;">
+        <div class="column"></div>
+        <div class="column">
+            <h1 class="title is-3 has-text-centered">{{ task.title }}</h1>
+            <hr>
+            <!-- TASK DETAIL -->
+            <form method="POST" action="{% url 'tasks:edit' %}">
+                {% csrf_token %}
+
+                <input type="hidden" value="{{ task.id }}" name="task_id">
+
+                <!-- TASK TITLE-->
+                <div class="field">
+                    <label class="label">Title</label>
+                    <div class="control">
+                        <input class="input" type="text" placeholder="Task title" name="title" value="{{ task.title }}"
+                               required {% if task.created_by != request.user %}disabled="disabled"{% endif %}>
+                    </div>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="field">
+                    <label class="label">Description</label>
+                    <div class="control">
+                        <textarea class="textarea" placeholder="Task description" name="description"
+                                  {% if task.created_by != request.user %}disabled="disabled"{% endif %}>{{ task.description }}</textarea>
+                    </div>
+                </div>
+
+                <!-- DOWNLOAD FILE -->
+                {% if task.files %}
+                <div class="field">
+                    <label class="label">File</label>
+                    <div class="control">
+                        <a href="{% url 'tasks:download_file' filename=task.files.name %}" target="_blank">Download file</a>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- STATUS -->
+                <div class="field">
+                    <label for="" class="label">Status</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="status" required
+                                    {% if task.created_by != request.user %}disabled="disabled"{% endif %}>
+                                {% for status in statuses %}
+                                    <option
+                                            {% if  status == task.status %}selected="selected"{% endif %}
+                                            value="{{ status }}">{{ status }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {% if task.team %}
+                    <!-- TASK TITLE-->
+                    <div class="field">
+                        <label class="label">Team</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Team" name="team_id"
+                                   value="{{ task.team }}" required disabled>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- ASSIGNEE -->
+                <div class="field">
+                    <label for="" class="label">Assigned To</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="assignee" id="assignee"
+                                    multiple required
+                                    {% if task.created_by != request.user %}disabled="disabled"{% endif %}
+                            >
+                                {% if task.team %}
+                                    {% for member in task.team.members.all %}
+                                        <option value="{{ member }}"
+                                                {% if member in task.assigned_to.all %}selected{% endif %}>
+                                            {{ member | title }}
+                                        </option>
+                                    {% endfor %}
+                                {% else %}
+                                    {% for user in users %}
+                                        <option value="{{ user }}"
+                                                {% if user in task.assigned_to.all %}selected{% endif %}>
+                                            {{ user | title }}
+                                        </option>
+                                    {% endfor %}
+                                {% endif %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                {% if task.created_by == request.user %}
+                    <div style="text-align:center;margin-top:120px;">
+                        <input class="button is-info is-outlined" type="submit" value="EDIT">
+                    </div>
+                {% endif %}
+
+            </form>
+        </div>
+        <div class="column"></div>
+    </div>
+
+    <div class="columns" style="margin-top: 30px;padding: 20px;">
+        <div class="column"></div>
+        <div class="column is-8">
+            <h1 class="title is-5">Comments</h1>
+            <hr>
+
+            {% for comment in comments %}
+                <article class="media">
+                    <figure class="media-left">
+                        <p class="image is-32x32">
+                            <img src="https://ui-avatars.com/api/?background=0D8ABC&color=fff&size=196&name={{ comment.author }}" alt="{{ comment.author }}">
+                        </p>
+                    </figure>
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong>{{ comment.author | title }}</strong>
+                                <br>
+                                {{ comment.body }}
+                                <br>
+                                <small>{{ comment.created_at }}</small>
+                            </p>
+                            {% if comment.file %}
+                                <a href="{% url 'tasks:download_file' filename=comment.file %}" target="_blank">Download Comment File</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </article>
+            {% endfor %}
+
+            <article class="media">
+                <figure class="media-left">
+                    <p class="image is-32x32">
+                        <img src="https://ui-avatars.com/api/?background=0D8ABC&color=fff&size=196&name={{ request.user }}" alt="{{ request.user }}">
+                    </p>
+                </figure>
+                <div class="media-content">
+                    <form action="{% url 'tasks:comment' task.id %}" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% if task.team %}
+                            <input type="hidden" name="team_id" value="{{ task.team.id }}">
+                        {% endif %}
+
+                        <div class="field">
+                            <p class="control">
+                                <textarea class="textarea" placeholder="Add a comment..." name="comment"></textarea>
+                            </p>
+                        </div>
+                        <div class="field">
+                            <p class="control">
+                                <input type="file" name="comment_file">
+                            </p>
+                        </div>
+                        <div class="field">
+                            <input class="button is-primary is-outlined" type="submit" value="Post Comment">
+                        </div>
+                    </form>
+                </div>
+            </article>
+        </div>
+        <div class="column"></div>
+    </div>
+
+{% endblock %}

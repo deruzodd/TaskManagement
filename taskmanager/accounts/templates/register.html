@@ -1,0 +1,120 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+    <section class="section">
+        <div class="columns">
+            <div class="column"></div>
+            <div class="column">
+                <h1 align="center" class="title">Register</h1>
+                <hr/>
+                <br/>
+
+                <form action="{% url 'accounts:register' %}" method="post">
+                    {% csrf_token %}
+
+                    {% if form.username.errors or form.password1.errors or form.password2.errors %}
+                        <article class="message is-danger">
+                            <div class="message-body">
+                                {% for field in form.visible_fields %}
+                                    {{ field.errors }}
+                                {% endfor %}
+                            </div>
+                        </article>
+                    {% endif %}
+
+                    <!-- EMAIL FIELD start -->
+                    <div class="field">
+                        <label for="email" class="label">Email</label>
+                        <div class="control has-icons-left">
+                            <input
+                                class="input"
+                                type="email"
+                                placeholder="user@example.com"
+                                name="email"
+                                required
+                            />
+                            <span class="icon is-left">
+                                <i class="fas fa-envelope"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <!-- EMAIL FIELD end -->
+
+                    <!-- NAME FIELD start -->
+                    <div class="field">
+                        <label for="username" class="label">Username</label>
+                        <div class="control has-icons-left">
+                            <input
+                                    class="input"
+                                    type="text"
+                                    placeholder="Username"
+                                    name="username"
+                                    required
+                                    autofocus
+                            />
+                            <span class="icon is-left">
+                            <i class="fas fa-user"></i>
+                        </span>
+                        </div>
+                    </div>
+                    <!-- NAME FIELD end -->
+
+                    <!-- PASSWORD FIELD start -->
+                    <div class="field">
+                        <label for="password1" class="label">Password</label>
+                        <div class="control has-icons-left">
+                            <input
+                                    class="input"
+                                    type="password"
+                                    name="password1"
+                                    id="password1"
+                                    required
+                            />
+                            <span class="icon is-left"> <i class="fas fa-lock"></i> </span>
+                        </div>
+                    </div>
+                    <!-- PASSWORD FIELD end -->
+
+                    <!-- PASSWORD FIELD start -->
+                    <div class="field">
+                        <label for="password2" class="label">Confirm Password</label>
+                        <div class="control has-icons-left">
+                            <input
+                                    class="input"
+                                    type="password"
+                                    name="password2"
+                                    id="password2"
+                                    required
+                            />
+                            <span class="icon is-left"> <i class="fas fa-lock"></i> </span>
+                        </div>
+                    </div>
+                    <!-- PASSWORD FIELD end -->
+
+
+                    <div
+                            class="field"
+                            style="margin:6% auto;display: flex;justify-content: center;"
+                    >
+                        <p class="control">
+                            <input
+                                    type="submit"
+                                    class="button is-primary is-outlined"
+                                    value="Register"
+                            />
+                        </p>
+                    </div>
+
+                    <h3 class="subtitle is-6 has-text-centered" style="margin-top: 30px;">
+                        <strong>Already a user ? <a href="{% url 'accounts:login' %}">Login here</a></strong>
+                    </h3>
+
+                    {% if request.GET.next %}
+                        <input type="hidden" name="next" value="{{ request.GET.next }}">
+                    {% endif %}
+                </form>
+            </div>
+            <div class="column"></div>
+        </div>
+    </section>
+{% endblock %}

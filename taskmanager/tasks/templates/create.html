@@ -1,0 +1,75 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+
+    {% include "navbar.html" %}
+
+    <div class="columns" style="margin-top:10px;padding : 15px;">
+        <div class="column"></div>
+        <div class="column">
+            <h1 class="title is-3 has-text-centered">Create Task</h1>
+            <hr>
+            <form method="POST" action="{% url 'tasks:create' %}" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- TASK TITLE-->
+                <div class="field">
+                    <label class="label">Title</label>
+                    <div class="control">
+                        <input class="input" type="text" placeholder="Task title" name="title" required>
+                    </div>
+                </div>
+
+                <!-- DESCRIPTION -->
+                <div class="field">
+                    <label class="label">Description</label>
+                    <div class="control">
+                        <textarea class="textarea" placeholder="Task Description" name="description"></textarea>
+                    </div>
+                </div>
+
+                <!-- UPLOAD FILE -->
+                <div class="field">
+                    <label class="label">File</label>
+                    <div class="control">
+                        <input class="input" type="file" name="files">
+                    </div>
+                </div>
+
+                <!-- STATUS -->
+                <div class="field">
+                    <label for="" class="label">Status</label>
+                    <div class="control">
+                        <div class="select is-fullwidth">
+                            <select name="status" required>
+                                <option value="Planned">Planned</option>
+                                <option value="Ongoing">Ongoing</option>
+                                <option value="Done">Done</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ASSIGNEE -->
+                <div class="field">
+                    <label for="assignee" class="label">Assigned To</label>
+                    <div class="select is-multiple is-fullwidth">
+                        <select name="assignee" id="assignee" multiple>
+                            {% for user in users %}
+                                <option value="{{ user }}">{{ user | title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div style="text-align:center;margin-top:120px;">
+                    <input class="button is-primary is-outlined" type="submit" value="CREATE">
+                </div>
+
+            </form>
+
+        </div>
+        <div class="column"></div>
+    </div>
+
+{% endblock %}

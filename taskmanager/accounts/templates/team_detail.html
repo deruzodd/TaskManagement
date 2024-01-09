@@ -1,0 +1,193 @@
+{% extends 'base_layout.html' %}
+{% load static %}
+
+{% block extrahead %}
+    <script src="{% static 'main.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+    {% include "navbar.html" %}
+
+    <div class="container">
+
+        {% if messages %}
+            <div class="columns" style="margin-top: 20px;">
+                <div class="column"></div>
+                <div class="column is-8">
+                    <article class="message is-danger">
+                        <div class="message-body">
+                            <ul class="messages">
+                                {% for message in messages %}
+                                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+                <div class="column"></div>
+            </div>
+        {% endif %}
+
+
+        <h1 class="title has-text-centered" style="margin-top:15px;">{{ team.team_name }}</h1>
+        <hr>
+
+        <div class="columns">
+            <!-- Tasks section -->
+            <div class="column is-6">
+                <h1 class="title is-4">
+                    Tasks
+                    <a style="margin-left:5px;" onclick="toggleForm()">
+                        <i class="far fa-plus-square fa-sm"></i>
+                    </a>
+                </h1>
+                <hr>
+
+                <!-- TASK FORM -->
+                <form method="POST" action="{% url 'tasks:create' %}" id="task_form" style="display: none;">
+                    {% csrf_token %}
+
+                    <input type="hidden" name="team_id" value="{{ team.id }}">
+
+                    <!-- TASK TITLE-->
+                    <div class="field">
+                        <label class="label">Title</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Task title" name="title" required>
+                        </div>
+                    </div>
+
+                    <!-- DESCRIPTION -->
+                    <div class="field">
+                        <label class="label">Description</label>
+                        <div class="control">
+                            <textarea class="textarea" placeholder="Task Description" name="description"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- STATUS -->
+                    <div class="field">
+                        <label for="" class="label">Status</label>
+                        <div class="control">
+                            <div class="select is-fullwidth">
+                                <select name="status" required>
+                                    <option value="Planned">Planned</option>
+                                    <option value="Ongoing">Ongoing</option>
+                                    <option value="Done">Done</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ASSIGNEE -->
+                    <div class="field">
+                        <label for="" class="label">Assigned To</label>
+                        <div class="select is-multiple is-fullwidth">
+                            <select name="assignee" id="assignee" multiple>
+                                {% for member in team.members.all %}
+                                    <option value="{{ member }}"
+                                    {% if request.user == member %}selected{% endif %}
+                                    >{{ member | title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center;margin-top:120px;">
+                        <input class="button is-primary is-outlined" type="submit" value="CREATE">
+                    </div>
+                </form>
+
+                <!-- TASK TABLE -->
+                {% if tasks|length == 0 %}
+                    <p class="subtitle is-5 has-text-centered" id="task_table">No tasks found.</p>
+                {% else %}
+                    <table class="table is-striped  is-hoverable is-fullwidth" id="task_table">
+                        <thead>
+                        <tr>
+                            <th>Sr. No</th>
+                            <th>Task</th>
+                            <th>Status</th>
+                            <th>Assignee</th>
+                            <th>Created by</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for task in tasks %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <a href="{% url 'tasks:detail' task.id %}"
+                                       style="color:#363636;">{{ task.title | truncatechars:15 }}</a>
+                                </td>
+                                <td>{{ task.status }}</td>
+                                <td>
+                                    {% for assignee in task.assigned_to.all %}
+                                        {% if not forloop.first %}, {% endif %}
+                                        {{ assignee | title }}
+                                    {% endfor %}
+                                </td>
+                                <td>{{ task.created_by }}</td>
+                                <td><a href="{% url 'tasks:detail' task.id %}"
+                                       class="button is-small is-outlined is-info">View</a></td>
+                                <td>
+                                    {% if task.created_by == request.user %}
+                                        <a href="{% url 'tasks:delete' task.id %}"
+                                           class="button is-small is-outlined is-danger">
+                                            Delete
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+
+            </div>
+            <div class="column"></div>
+            <!-- Members section-->
+            <div class="column is-3">
+                <h1 class="title is-4">Members</h1>
+                <hr>
+                <ul>
+                    {% for member in team.members.all %}
+                        <li class="subtitle is-6" style="margin-bottom:10px;">
+                            <b>{{ forloop.counter }}. {{ member | title }}
+                                {% if team.created_by == member %}
+                                    <span class="tag is-info">Admin</span>
+                                {% endif %}
+                            </b>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <form action="{% url 'accounts:add_team_member' %}" method="POST" style="margin-top: 20px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="team_id" value="{{ team.id }}">
+                    <div class="field">
+                        <label class="label" for="members">Add Members</label>
+                        <div class="select is-multiple is-fullwidth">
+                            <select name="members" id="members" multiple>
+                                {% for user in users %}
+                                    {% if user not in team.members.all %}
+                                        <option value="{{ user }}">{{ user|title }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div style="text-align:center;margin-top:120px;">
+                        <input class="button is-small is-primary is-outlined" type="submit" value="Add">
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

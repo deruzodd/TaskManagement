@@ -1,0 +1,49 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+
+    {% include "navbar.html" %}
+
+    <div class="container">
+
+        <div class="columns" style="margin-top:10px;padding : 15px;">
+            <div class="column"></div>
+            <div class="column">
+                <h1 class="title is-3 has-text-centered">Create Team</h1>
+                <hr>
+
+                <form action="{% url 'accounts:create_team' %}" method="POST">
+                    {% csrf_token %}
+
+                    <!-- TEAM NAME-->
+                    <div class="field">
+                        <label class="label">Team name</label>
+                        <div class="control">
+                            <input class="input" type="text" placeholder="Team name" name="team_name" required>
+                        </div>
+                    </div>
+
+                    <!-- Members -->
+                    <div class="field">
+                        <label class="label">Members</label>
+                        <div class="select is-multiple is-fullwidth">
+                            <select name="members" multiple>
+                                {% for user in users %}
+                                    <option value="{{ user }}">{{ user | title }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="text-align:center;margin-top:120px;">
+                        <input class="button is-primary is-outlined" type="submit" value="CREATE">
+                    </div>
+                </form>
+            </div>
+            <div class="column"></div>
+        </div>
+
+
+    </div>
+
+{% endblock %}

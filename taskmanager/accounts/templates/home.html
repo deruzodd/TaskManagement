@@ -1,0 +1,130 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+
+    {% include "navbar.html" %}
+
+    <div class="container" style="margin-top:20px;">
+
+        {% if messages %}
+            <div class="columns" style="margin-top: 20px;">
+                <div class="column"></div>
+                <div class="column is-8">
+                    <article class="message is-danger">
+                        <div class="message-body">
+                            <ul class="messages">
+                                {% for message in messages %}
+                                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+                <div class="column"></div>
+            </div>
+        {% endif %}
+
+
+        <div class="columns">
+            <div class="column is-7">
+                <h1 class="title is-4">Tasks
+                    <a href="{% url 'tasks:create' %}" style="margin-left:5px;">
+                        <i class="far fa-plus-square fa-sm"></i>
+                    </a>
+                </h1>
+                <hr>
+
+                {% if tasks|length == 0 %}
+                    <p class="subtitle is-5 has-text-centered">No tasks found.</p>
+                {% else %}
+                    <table class="table is-striped  is-hoverable is-fullwidth">
+                        <thead style="border: 1px solid #ccc;">
+                            <tr>
+                                <th style="border: 1px solid #ccc;">Sr. No</th>
+                                <th style="border: 1px solid #ccc;">Task</th>
+                                <th style="border: 1px solid #ccc;">Status</th>
+                                <th style="border: 1px solid #ccc;">Team</th>
+                                <th style="border: 1px solid #ccc;">Assignee</th>
+                                <th style="border: 1px solid #ccc;">Created by</th>
+                                <th style="border: 1px solid #ccc;">View</th>
+                                <th style="border: 1px solid #ccc;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for task in tasks %}
+                            <tr>
+                                <td style="border: 1px solid #ccc;">{{ forloop.counter }}</td>
+                                <td style="border: 1px solid #ccc;">
+                                    <a href="{% url 'tasks:detail' task.id %}" style="color: #000; font-size: 10px; font-weight: bold;">
+                                        {{ task.title | truncatechars:15 }}
+                                    </a>
+                                </td>
+                                <td style="border: 1px solid #ccc;">
+                                    <div style="border: 1px solid {% if task.status == 'Planned' %}blue{% elif task.status == 'Ongoing' %}orange{% elif task.status == 'Done' %}green{% endif %}; 
+                                                padding: 3px; border-radius: 3px; text-align: center; 
+                                                color: {% if task.status == 'Planned' %}blue{% elif task.status == 'Ongoing' %}orange{% elif task.status == 'Done' %}green{% endif %};
+                                                font-size: 13px;">
+                                        {{ task.status }}
+                                    </div>
+                                </td>
+                                <td style="border: 1px solid #ccc;">{{ task.team }}</td>
+                                <td style="border: 1px solid #ccc;">
+                                    {% for assignee in task.assigned_to.all %}
+                                        {% if not forloop.first %}, {% endif %}
+                                        {{ assignee | title }}
+                                    {% endfor %}
+                                </td>
+                                <td style="border: 1px solid #ccc;">{{ task.created_by }}</td>
+                                <td style="border: 1px solid #ccc;">
+                                    <a href="{% url 'tasks:detail' task.id %}" class="button is-small is-outlined is-info">View</a>
+                                </td>
+                                <td style="border: 1px solid #ccc;">
+                                    {% if task.created_by == request.user %}
+                                        <a href="{% url 'tasks:delete' task.id %}" class="button is-small is-outlined is-danger">
+                                            Delete
+                                        </a>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+
+            </div>
+            <div class="column"></div>
+            <div class="column is-4">
+                <h1 class="title is-4">Your Teams <a href="{% url 'accounts:create_team' %}" style="margin-left:5px;"><i
+                        class="far fa-plus-square fa-sm"></i></a></h1>
+                <hr>
+
+                {% if teams|length == 0 %}
+                    <p class="subtitle is-5 has-text-centered">No teams found.</p>
+                {% else %}
+                    <table class="table is-striped  is-hoverable is-fullwidth" style="font-weight: bold;">
+                        <thead style="border: 1px solid #ccc;">
+                            <tr>
+                                <th style="border: 1px solid #ccc;">Team</th>
+                                <th style="border: 1px solid #ccc;">View</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for team in teams %}
+                                <tr style="border: 1px solid #ccc;">
+                                    <td style="border: 1px solid #ccc;">
+                                        {{ team.team_name }}
+                                    </td>
+                                    <td style="border: 1px solid #ccc;">
+                                        <a href="{% url 'accounts:team_detail' team.id %}" class="button is-small is-outlined is-info">
+                                            View
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

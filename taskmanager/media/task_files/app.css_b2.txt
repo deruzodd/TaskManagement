@@ -1,0 +1,144 @@
+.App {
+  text-align: center;
+}
+
+h1 {
+  font-size: 36px;
+  margin-bottom: 20px;
+}
+
+.tasks {
+  display: flex;
+  justify-content: space-around;
+}
+
+.task-buttons {
+  width: 200px;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.task-buttons button {
+  display: block;
+  margin-bottom: 10px;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.task-display {
+  flex: 1;
+  padding: 10px;
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  text-align: left;
+}
+
+.calculator {
+  width: 300px;
+  margin: 0 auto;
+  padding: 30px;
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.display {
+  width: 92%;
+  height: 50px;
+  font-size: 24px;
+  text-align: right;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+.buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.button {
+  flex: 1;
+  height: 50px;
+  font-size: 18px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #eee;
+}
+
+.list {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #f4f4f4;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.description {
+  font-size: 18px;
+}
+
+.userInput {
+  width: 100%;
+  height: 30px;
+  font-size: 16px;
+  padding: 5px;
+  margin: 10px 0;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  font-size: 20px;
+  margin: 5px 0;
+}
+
+.addItemInput {
+  width: 100%;
+  height: 30px;
+  font-size: 16px;
+  padding: 5px;
+  margin: 10px 0;
+}
+
+.addItemButton,
+.removeItemButton {
+  width: 100%;
+  height: 40px;
+  font-size: 18px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007BFF;
+  color: #fff;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.addItemButton:hover,
+.removeItemButton:hover {
+  background-color: #0056b3;
+}
